@@ -14,7 +14,7 @@ class UserBot:
     BASE_URL = "https://www.okcupid.com/"
 
     def __init__(self, email, password, age=None, gender='Man', headless=False, created=False, country="Canada",
-                 zip_code=None, city='Toronto'):
+                 zip_code=None, city='Toronto', looking_for='Women'):
         if not created:
             options = Options()
             options.headless = headless
@@ -27,6 +27,7 @@ class UserBot:
             end_dt = datetime.datetime.now() - datetime.timedelta(days=age * 365)
             self.birth_date = self.random_date(start_dt, end_dt)
             self.city = city
+            self.looking_for = looking_for
 
     @staticmethod
     def random_date(start_dt, end_dt):
@@ -111,8 +112,8 @@ class UserBot:
             '//*[@id="main_content"]/div[1]/span/div/div/div[1]/div/div/div/div/div/span/div[2]/div[1]/label/select'). \
             send_keys(self.country)
         self.driver.find_element_by_xpath(
-            '//*[@id="main_content"]/div[1]/span/div/div/div[1]/div/div/div/div/div/span/div[2]/div[2]/span[2]/input').\
-            send_keys(self.city, Keys.RETURN)
+            '//*[@id="main_content"]/div[1]/span/div/div/div[1]/div/div/div/div/div/span/div[2]/div[2]/span[2]/input') \
+            .send_keys(self.city, Keys.RETURN)
         time.sleep(2)
         self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/div/div[3]/button').click()
         time.sleep(5)
@@ -120,6 +121,49 @@ class UserBot:
     def initiate_preferences(self):
         self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/button')
         time.sleep(5)
+
+    def enter_connections(self):
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div/div/div[1]/div/div/div/div/div/div/div/div/button[1]'). \
+            click()
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div/div/div[1]/div/div/div/div/div/div/div/div/button[2]'). \
+            click()
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div/div/div[1]/div/div/div/div/div/div/div/div/button[3]'). \
+            click()
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div/div/div[1]/div/div/div/div/div/div/div/div/button[4]'). \
+            click()
+        self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/div/div/div/button').click()
+        time.sleep(5)
+
+    def enter_desired_mate(self):
+        if self.looking_for == 'Women':
+            self.driver.find_element_by_xpath(
+                '//*[@id="main_content"]/div[1]/span/div/div/div' +
+                '/div/div[1]/div/div/div/div/div[1]/div/div/div/button[2]').click()
+        elif self.looking_for == 'Men':
+            self.driver.find_element_by_xpath(
+                '//*[@id="main_content"]/div[1]/span/div/div/div/' +
+                'div/div[1]/div/div/div/div/div[1]/div/div/div/button[1]').click()
+        else:
+            exit('Invalid Desired Mate')
+        self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/div/div/div/button[2]').click()
+        time.sleep(5)
+
+    def enter_desired_age(self):
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div/div/div[1]/div/div/div/div/label[1]/select').click()
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div/div/div[1]/div/div/div/div/label[1]/select').send_keys(
+            '18')
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div/div/div[1]/div/div/div/div/label[2]/select').click()
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div/div/div[1]/div/div/div/div/label[2]/select').send_keys(
+            '99')
+        self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/div/div/div/button[2]').click()
 
 
 if __name__ == '__main__':
@@ -133,3 +177,6 @@ if __name__ == '__main__':
     bot.enter_birth_date()
     bot.enter_living_info()
     bot.initiate_preferences()
+    bot.enter_connections()
+    bot.enter_desired_mate()
+    bot.enter_desired_age()
