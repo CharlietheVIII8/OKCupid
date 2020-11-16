@@ -3,6 +3,7 @@ import random
 import time
 
 import names
+from Photo import Photo
 from selenium import webdriver
 from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.chrome.options import Options
@@ -12,6 +13,7 @@ from selenium.webdriver.common.keys import Keys
 class UserBot:
     DRIVER_PATH = 'chromedriver.exe'
     BASE_URL = "https://www.okcupid.com/"
+    GENERATED_PHOTOS_API_KEY = 'h839ZfTUYsDmet4_iY6Adg'
 
     def __init__(self, email, password, age=None, gender='Man', headless=False, created=False, country="Canada",
                  zip_code=None, city='Toronto', looking_for='Women'):
@@ -28,6 +30,7 @@ class UserBot:
             self.birth_date = self.random_date(start_dt, end_dt)
             self.city = city
             self.looking_for = looking_for
+            self.photo = Photo(gender, age)
 
     @staticmethod
     def random_date(start_dt, end_dt):
@@ -164,10 +167,15 @@ class UserBot:
             '//*[@id="main_content"]/div[1]/span/div/div/div/div/div[1]/div/div/div/div/label[2]/select').send_keys(
             '99')
         self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/div/div/div/button[2]').click()
+        time.sleep(5)
+
+    def initiate_tell_us_about_yourself(self):
+        self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/button').click()
+        time.sleep(5)
 
 
-if __name__ == '__main__':
-    bot = UserBot('randomemail758598@gmail.com', 'jsdjlkkjkljkl', age=23)
+def create_user_bot(email, password, age):
+    bot = UserBot(email, password, age=age)
     bot.initiate_join()
     bot.enter_email()
     bot.enter_password()
@@ -180,3 +188,9 @@ if __name__ == '__main__':
     bot.enter_connections()
     bot.enter_desired_mate()
     bot.enter_desired_age()
+    bot.initiate_tell_us_about_yourself()
+    return bot
+
+
+if __name__ == '__main__':
+    bot = create_user_bot('randomemail758598@gmail.com', 'jsdjlkkjkljkl', age=23)
