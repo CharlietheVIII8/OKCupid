@@ -13,17 +13,20 @@ class UserBot:
     DRIVER_PATH = 'chromedriver.exe'
     BASE_URL = "https://www.okcupid.com/"
 
-    def __init__(self, email, password, age=None, gender='Man', headless=False, created=False):
+    def __init__(self, email, password, age=None, gender='Man', headless=False, created=False, country="Canada",
+                 zip_code=None, city='Toronto'):
         if not created:
             options = Options()
             options.headless = headless
             options.add_argument("start-maximized")
             self.driver = webdriver.Chrome(options=options, executable_path=self.DRIVER_PATH)
-            self.email, self.password, self.gender, self.age = email, password, gender, age
+            self.email, self.password, self.gender, self.age, self.country, self.zip_code = email, password, gender, \
+                                                                                            age, country, zip_code
             self.first_name = names.get_first_name(gender='male')
             start_dt = datetime.datetime.now() - datetime.timedelta(days=(age + 1) * 365)
             end_dt = datetime.datetime.now() - datetime.timedelta(days=age * 365)
             self.birth_date = self.random_date(start_dt, end_dt)
+            self.city = city
 
     @staticmethod
     def random_date(start_dt, end_dt):
@@ -100,6 +103,24 @@ class UserBot:
         self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/div/div[3]/button').click()
         time.sleep(5)
 
+    def enter_living_info(self):
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div[1]/div/div/div/div/div/span/div[2]/div[1]/label/select'). \
+            click()
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div[1]/div/div/div/div/div/span/div[2]/div[1]/label/select'). \
+            send_keys(self.country)
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div[1]/div/div/div/div/div/span/div[2]/div[2]/span[2]/input').\
+            send_keys(self.city, Keys.RETURN)
+        time.sleep(2)
+        self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/div/div[3]/button').click()
+        time.sleep(5)
+
+    def initiate_preferences(self):
+        self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/button')
+        time.sleep(5)
+
 
 if __name__ == '__main__':
     bot = UserBot('randomemail758598@gmail.com', 'jsdjlkkjkljkl', age=23)
@@ -109,4 +130,6 @@ if __name__ == '__main__':
     bot.initiate_profile_creation()
     bot.enter_first_name()
     bot.enter_gender()
-    bot.enter_birthdate()
+    bot.enter_birth_date()
+    bot.enter_living_info()
+    bot.initiate_preferences()
