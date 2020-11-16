@@ -1,6 +1,6 @@
-import names
 import time
 
+import names
 from selenium import webdriver
 from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.chrome.options import Options
@@ -11,14 +11,13 @@ class CreateUserBot:
     DRIVER_PATH = 'chromedriver.exe'
     BASE_URL = "https://www.okcupid.com/"
 
-    def __init__(self, email, password, headless=False):
+    def __init__(self, email, password, gender='Man', headless=False):
         options = Options()
         options.headless = headless
         options.add_argument("start-maximized")
         self.driver = webdriver.Chrome(options=options, executable_path=self.DRIVER_PATH)
-        self.email, self.password = email, password
+        self.email, self.password, self.gender = email, password, gender
         self.first_name = names.get_first_name(gender='male')
-        self.last_name = names.get_last_name()
 
     def initiate_join(self):
         self.driver.get(self.BASE_URL)
@@ -50,6 +49,18 @@ class CreateUserBot:
         self.driver.find_element_by_name('name').send_keys(self.first_name, Keys.RETURN)
         time.sleep(5)
         self.driver.find_element_by_class_name('profileDetails-button--next profileDetails-button--fixed').click()
+        time.sleep(5)
+
+    def enter_gender(self):
+        if self.gender == 'Man':
+            self.driver.find_element_by_xpath(
+                '//*[@id="main_content"]/div[1]/span/div/div/div[1]/div/div/div/div/div/label[2]').click()
+        elif self.gender == 'Woman':
+            self.driver.find_element_by_xpath(
+                '//*[@id="main_content"]/div[1]/span/div/div/div[1]/div/div/div/div/div/label[1]').click()
+        else:
+            exit('Invalid Gender')
+        self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/div/div[3]/button').click()
         time.sleep(5)
 
 
