@@ -1,13 +1,16 @@
 import datetime
+import os
 import random
 import time
 
 import names
-from Photo import Photo
 from selenium import webdriver
 from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
+
+from Photo import Photo
+from constants import intro
 
 
 class UserBot:
@@ -173,6 +176,27 @@ class UserBot:
         self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/button').click()
         time.sleep(5)
 
+    def upload_photo(self):
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div[2]/div/div/div[1]/div/div/div/div[2]/svg').click()
+        time.sleep(1)
+        time.sleep(1)
+        cwd = os.getcwd()
+        photo = '{}/{}'.format(cwd, self.photo.photo)
+        self.driver.find_element_by_xpath('//*[@id="service_computer"]/i').send_keys(photo, Keys.RETURN)
+        time.sleep(5)
+        self.driver.find_element_by_xpath('//*[@id="okphotos_edit_next"]').click()
+        time.sleep(2)
+        self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/div/button').click()
+        time.sleep(5)
+
+    def enter_introduction(self):
+        self.driver.find_element_by_xpath(
+            '//*[@id="main_content"]/div[1]/span/div/div/div/div/span/textarea').send_keys(intro)
+        time.sleep(1)
+        self.driver.find_element_by_xpath('//*[@id="main_content"]/div[1]/span/div/div/button').click()
+        time.sleep(5)
+
 
 def create_user_bot(email, password, age):
     bot = UserBot(email, password, age=age)
@@ -189,6 +213,8 @@ def create_user_bot(email, password, age):
     bot.enter_desired_mate()
     bot.enter_desired_age()
     bot.initiate_tell_us_about_yourself()
+    bot.upload_photo()
+    bot.enter_introduction()
     return bot
 
 
